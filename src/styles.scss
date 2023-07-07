@@ -1,0 +1,21 @@
+/* You can add global styles to this file, and also import other style files */
+
+// TailwindCSS imports
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// Google Fonts
+@import url('https://fonts.googleapis.com/css2?family=Agdasima:wght@400;700&display=swap');
+
+html,body {
+    margin: 0;
+    padding: 0;
+}
+
+// Font Class
+.agdasima {
+    font-family: 'Agdasima', sans-serif;
+}
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
