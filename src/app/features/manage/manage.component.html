@@ -1,3 +1,27 @@
-<div class="flex gap-4 items-center">
-    <input type="text">
+
+<div class="flex justify-between items-center mb-16">
+    <h2>Word List</h2>
+    <button (click)="clickAdd()" mat-mini-fab color="primary" aria-label="Example icon button with a home icon">
+        <mat-icon>add</mat-icon>
+    </button>
+</div>
+
+<div class="shadow rounded">
+    <mat-tab-group [(selectedIndex)]="tabIndex" dynamicHeight>
+        <mat-tab label="First">
+            <ng-container *ngIf="(words$ | async)?.length; else noWords">
+                <mat-card >
+                    Test
+                </mat-card>
+                
+            </ng-container>
+            <ng-template #noWords>
+                <div class="text-center text-gray-500 p-20 shadow-sm">No words to guess yet, click "+" to add.</div>
+            </ng-template>
+        </mat-tab>
+        <mat-tab label="Second">
+            
+        </mat-tab>
+        <mat-tab label="Third"> Content 3 </mat-tab>
+    </mat-tab-group>
 </div>
