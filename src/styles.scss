@@ -7,11 +7,12 @@
 
 // Google Fonts
 @import url('https://fonts.googleapis.com/css2?family=Agdasima:wght@400;700&display=swap');
+@import 'assets/styles/colors';
 
 html,body {
     margin: 0;
     padding: 0;
-    background-color: #eefbe4;
+    background-color: $gray;
 }
 
 // Font Class

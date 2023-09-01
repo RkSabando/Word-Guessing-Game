@@ -1,7 +1,9 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { LocalStorageService } from 'src/app/services/local-storage/local-storage.service';
 import { StateService } from 'src/app/services/state/state.service';
+import { WordFormComponent } from './word-form/word-form/word-form.component';
 
 @Component({
   selector: 'app-manage',
@@ -16,7 +18,8 @@ export class ManageComponent {
 
   constructor(
     private storage: LocalStorageService,
-    private state: StateService
+    private state: StateService,
+    private dialog: MatDialog
   ){
     let vm = this.storage.get('state');
     console.log('vm', vm);
@@ -33,7 +36,7 @@ export class ManageComponent {
   }
 
   clickAdd() {
-    this.tabIndex = 1;
+    let dialogRef = this.dialog.open(WordFormComponent);
   }
 
 }
