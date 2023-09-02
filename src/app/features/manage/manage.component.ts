@@ -14,7 +14,7 @@ import { WordFormComponent } from './word-form/word-form/word-form.component';
 export class ManageComponent {
 
   words$ = this.state.words$;
-  tabIndex: number = 1;
+  tabIndex: number = 0;
 
   constructor(
     private storage: LocalStorageService,

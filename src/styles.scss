@@ -1,18 +1,44 @@
 /* You can add global styles to this file, and also import other style files */
-
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@use '@angular/material' as mat;
+// @use '@angular/material/theming';
+// Plus imports for other components in your app.
+@use 'assets/styles/palette' as palette;
+@use 'assets/styles/fonts';
+@use 'assets/styles/colors' as colors;
 // TailwindCSS imports
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
-// Google Fonts
-@import url('https://fonts.googleapis.com/css2?family=Agdasima:wght@400;700&display=swap');
-@import 'assets/styles/colors';
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat.core();
+@include mat.legacy-core();
+
+$code-next-door-primary: mat.define-palette(palette.$primary-pat);
+$code-next-door-accent: mat.define-palette(palette.$accent-pat, A200, A100, A400);
+
+// The warn palette is optional (defaults to red).
+$code-next-door-warn: mat.define-palette(palette.$warn-pat);
+
+// Create the theme object. A theme consists of configurations for individual
+// theming systems such as "color" or "typography".
+$code-next-door-theme: mat.define-light-theme((
+  color: (
+    primary: $code-next-door-primary,
+    accent: $code-next-door-accent,
+    warn: $code-next-door-warn,
+  )
+));
+@include mat.all-component-themes($code-next-door-theme);
 
 html,body {
     margin: 0;
     padding: 0;
-    background-color: $gray;
+    background-color: colors.$gray;
 }
 
 // Font Class

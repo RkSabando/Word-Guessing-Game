@@ -11,12 +11,11 @@
         <mat-tab label="First">
             <ng-container *ngIf="(words$ | async)?.length; else noWords">
                 <mat-card >
-                    Test
+                    <div class="text-center text-gray-500 p-10 shadow-sm bg-gray-100 rounded-sm">word list</div>
                 </mat-card>
-                
             </ng-container>
             <ng-template #noWords>
-                <div class="text-center text-gray-500 p-20 shadow-sm">No words to guess yet, click "+" to add.</div>
+                <div class="text-center text-gray-500 p-20 shadow-sm bg-gray-100 rounded-sm">No words to guess yet, click "+" to add.</div>
             </ng-template>
         </mat-tab>
         <mat-tab label="Second">
@@ -24,6 +23,5 @@
                 
             </div>
         </mat-tab>
-        <mat-tab label="Third"> Content 3 </mat-tab>
     </mat-tab-group>
 </div>
