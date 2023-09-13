@@ -8,7 +8,7 @@
             <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
               Word/Phrase
             </label>
-            <input [ngClass]="{'border-red-300': wordForm.get('word')?.dirty &&  wordForm.get('word')?.hasError('required') }" formControlName="word" class="appearance-none block w-full bg-gray-100 text-gray-700 border  rounded py-3 px-4 mb-1 leading-tight focus:outline-none focus:bg-white" type="text" placeholder="Word/Phrase to guess">
+            <input [ngClass]="{'border-red-300': wordForm.get('word')?.dirty &&  wordForm.get('word')?.hasError('required') }" formControlName="word" class="appearance-none block w-full bg-white text-gray-700 border text-sm rounded-lg p-2.5 mb-1 leading-tight focus:outline-none focus:bg-white focus:ring-blue-500 focus:border-blue-500" type="text" placeholder="Word/Phrase to guess">
             <p class="{{wordForm.get('word')?.dirty &&  wordForm.get('word')?.hasError('required') ? 'visible' : 'invisible' }} text-red-300 text-xs italic mb-2">Please fill out this field.</p>
           </div>
           <div class="w-full px-3">
@@ -18,26 +18,26 @@
             <div formArrayName="clues">
               <div cdkDropList [cdkDropListData]="clues.controls" class="example-list" (cdkDropListDropped)="drop($event)">
                 <ng-container *ngIf="clues.length > 1">
-                  <div [cdkDragDisabled]="clues.length <= 2 && currentIndex !== i" cdkDrag class="flex justify-between gap-1" *ngFor="let item of clues.controls | slice:0 : clues.length - 1 ; let i = index">
+                  <div [cdkDragDisabled]="clues.length <= 2 || isEditing" cdkDrag class="flex justify-between gap-1" *ngFor="let item of clues.controls | slice:0 : clues.length - 1 ; let i = index">
                     <div class="flex flex-grow justify-between gap-1 {{currentIndex === i || item.get('clue')?.value ? 'visible' : 'invisible'}}" >
                       <div class="flex-grow" [formGroupName]="i" >
                         <div class="flex group justify-end items-start relative">
                           <!-- <div #element formControlName="clue" [contentEditable]="currentIndex === i" class="block p-2.5 w-full text-sm text-gray-700 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 outline-none">
                           </div>
                           <input class="hidden" formControlName="clue" type="text"> -->
-                          <textarea #element autoResize formControlName="clue" rows="1" class="" placeholder="Clue for the word">
+                          <textarea [ngClass]="{'focus:border-blue-500': currentIndex === i, 'cursor-default': currentIndex !== i}" [readonly]="currentIndex !== i" (input)="autoResize(element)"  #element autoResize formControlName="clue" rows="1" class="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none" placeholder="Clue for the word">
                           </textarea>
                           <!-- <input #element [readonly]="currentIndex !== i" [ngClass]="{'border-red-300': item.get('clue')?.dirty &&  item.get('clue')?.hasError('required')}" formControlName="clue" class="{{ currentIndex === i ? 'bg-gray-100' : 'bg-white' }} appearance-none block w-full mb-1 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white shadow-sm focus:cursor-text" type="text" placeholder="Clue for the word"> -->
-                          <div cdkDragHandle *ngIf="clues.length > 2 && currentIndex !== i"  class="cursor-pointer absolute hidden group-hover:inline-block transform -translate-x-1 translate-y-3">
+                          <div cdkDragHandle *ngIf="clues.length > 2 && currentIndex !== i && !isEditing"  class="cursor-pointer absolute hidden group-hover:inline-block transform -translate-x-1 translate-y-2.5">
                             <mat-icon>swap_vert</mat-icon>
                           </div>
                         </div>
-                        <p class="{{item.get('clue')?.dirty &&  item.get('clue')?.hasError('required') ? 'visible' : 'invisible' }} text-red-300 text-xs italic mb-2">Please fill out this field.</p>
+                        <p class="{{item.get('clue')?.dirty &&  item.get('clue')?.hasError('required') ? 'visible' : 'invisible' }} text-red-300 text-xs italic mb-2 ">Please fill out this field.</p>
                       </div>
-                      <button mat-icon-button class="{{ currentIndex === i ? 'visible' : 'invisible' }}" (click)="deleteClue(i)" color="warn" aria-label="Example icon button with a home icon">
+                      <button class="action-buttons" mat-icon-button class="{{ currentIndex === i ? 'visible' : 'invisible' }}" (click)="deleteClue(i)" color="warn" aria-label="Example icon button with a home icon">
                         <mat-icon style="font-size:24px">delete</mat-icon>
                       </button>
-                      <button [color]="currentIndex === i ? 'accent' : ''" (click)="currentIndex !== i ? editClue(i) : addClue(item.get('clue'),  true)" mat-icon-button aria-label="Example icon button with a home icon">
+                      <button class="action-buttons" [color]="currentIndex === i ? 'accent' : ''" (click)="currentIndex !== i ? editClue(i, element) : addClue(item.get('clue'),  true)" mat-icon-button aria-label="Example icon button with a home icon">
                         <mat-icon style="font-size:24px" *ngIf="currentIndex === i">done</mat-icon>
                         <mat-icon style="font-size:24px" *ngIf="currentIndex !== i">edit</mat-icon>
                       </button>
@@ -49,15 +49,8 @@
                   <ng-container *ngIf="last">
                     <div  class="flex flex-grow justify-between gap-1 {{ currentIndex === i ? 'visible' : 'invisible'}}" >
                       <div class="flex-grow" [formGroupName]="i" >
-                        <textarea #element autoResize formControlName="clue" rows="1" class="w-full" placeholder="Clue for the word">
+                        <textarea [ngClass]="{'focus:border-blue-500': currentIndex === i}" (input)="autoResize(element)" #element autoResize formControlName="clue" rows="1" class="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none" placeholder="Clue for the word">
                         </textarea>
-                        <!-- <input [ngClass]="{'border-red-300': item.get('clue')?.dirty &&  item.get('clue')?.hasError('required') }" formControlName="clue" class="appearance-none block w-full bg-gray-100 mb-1 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white" type="text" placeholder="Clue for the word"> -->
-                        <!-- <input class="hidden" formControlName="clue" type="text">
-                        <div class="content-editor relative">
-                          <div *ngIf="item.get('clue')?.invalid" class="absolute block p-2.5 w-full text-sm text-gray-400 z-0">Clue for the word</div>
-                          <div [contentEditable]="currentIndex === i" formControlName="clue" [ariaPlaceholder]="'test'" #element contenteditable class="relative z-10 bg-transparent focus:bg-white block p-2.5 w-full text-sm text-gray-700 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 outline-none">
-                          </div>
-                        </div> -->
                         <p class="{{item.get('clue')?.dirty &&  item.get('clue')?.hasError('required') ? 'visible' : 'invisible' }} text-red-300 text-xs italic mb-2">Please fill out this field.</p>
                       </div>
                       <button mat-icon-button class="invisible" color="warn" aria-label="Example icon button with a home icon">
@@ -74,46 +67,10 @@
 
             </div>
           </div>
-          <div class="w-full px-3 flex items-center justify-center">
-          </div>
         </div>
-        <!-- <div class="flex flex-wrap -mx-3 mb-6">
-          <div class="w-full px-3">
-            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-password">
-              Password
-            </label>
-            <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-password" type="password" placeholder="******************">
-            <p class="text-gray-600 text-xs italic">Make it as long and as crazy as you'd like</p>
-          </div>
-        </div>
-        <div class="flex flex-wrap -mx-3 mb-2">
-          <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-city">
-              City
-            </label>
-            <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-city" type="text" placeholder="Albuquerque">
-          </div>
-          <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-state">
-              State
-            </label>
-            <div class="relative">
-              <select class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-state">
-                <option>New Mexico</option>
-                <option>Missouri</option>
-                <option>Texas</option>
-              </select>
-              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-              </div>
-            </div>
-          </div>
-          <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-zip">
-              Zip
-            </label>
-            <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-zip" type="text" placeholder="90210">
-          </div>
-        </div> -->
       </form>
+      <div class="flex justify-end gap-2 w-full">
+        <button mat-button class="text-gray-700 hover:text-gray-800" (click)="cancelAction()">Cancel</button>
+        <button [ngClass]="{'cursor-not-allowed': isEditing || wordForm.get('word')?.invalid || cluesValidity}" [disabled]="isEditing || wordForm.get('word')?.invalid || cluesValidity" mat-flat-button (click)="saveAction()" color="primary" cdkFocusInitial>Save</button>
+      </div>
 </mat-dialog-content>

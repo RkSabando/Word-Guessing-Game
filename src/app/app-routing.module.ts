@@ -1,10 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { guessGuard } from './guards/guess/guess.guard';
 
 const routes: Routes = [
   {
     path: '',
-    loadChildren: () => import('./features/guess/guess.module').then(m => m.GuessModule)
+    loadChildren: () => import('./features/guess/guess.module').then(m => m.GuessModule),
+    canActivate: [guessGuard]
   },
   {
     path: 'manage',

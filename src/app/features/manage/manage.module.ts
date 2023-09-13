@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ManageComponent } from './manage.component';
 import { RouterModule, Routes } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
-import { WordFormComponent } from './word-form/word-form/word-form.component';
 
 // Materials
 import { MatIconModule } from '@angular/material/icon';
@@ -33,8 +32,7 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    ManageComponent,
-    WordFormComponent
+    ManageComponent
   ],
   imports: [
     CommonModule,

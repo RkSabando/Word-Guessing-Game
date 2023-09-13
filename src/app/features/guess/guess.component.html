@@ -1,1 +1,34 @@
-<p>guess works!</p>
+<app-keyboard (actionChange)="action($event)" (selectionChange)="changeSelection($event)" [letters]="vm?.letters" [currentWord]="currentWord ? currentWord!.word : ''"></app-keyboard>
+<ng-container *ngIf="currentWord">
+    <div class="p-10 pt-5 mt-10 bg-white shadow-md rounded">
+        <div class="flex items-center justify-center flex-wrap gap-8 ">
+            <ng-container *ngFor="let word of currentWordLetters; let last=last">
+                <div class="flex-shrink-0  inline-flex items-center justify-center flex-nowrap gap-4">
+                    <div *ngFor="let letter of word" [ngClass]="{'box-border border-b-2 border-gray-800': letter !== ' '}" class="w-16 h-16 flex items-center justify-center">
+                        <h2 *ngIf="checkLetter(letter); else noLetter" class="text-4xl font-bold" @fadeIn>{{ letter | titlecase}}</h2>
+                        <ng-template #noLetter>
+                            <h2 class="text-4xl font-bold" >&nbsp;</h2>
+                        </ng-template>
+                    </div>
+                </div>
+                <div *ngIf="!last" class="spacer"></div>
+            </ng-container>
+    
+        </div>
+
+        <div class="mt-20">
+            <mat-tab-group [(selectedIndex)]="clueIndex" dynamicHeight>
+                <mat-tab *ngFor="let clue of currentWord.clues">
+                    <p class="text-gray-600 text-xl">{{ clue.clue }}</p>
+                </mat-tab>
+            </mat-tab-group>
+            <div class="mt-10 flex justify-end">
+                <button *ngIf="currentWord.clues.length > 1" (click)="nextClue()" mat-flat-button color="primary">Next Clue</button>
+            </div>
+        </div>
+    </div>
+    
+    <p class="text-xl mt-10">TOTAL POINTS: {{score}}</p>
+</ng-container>
+
+

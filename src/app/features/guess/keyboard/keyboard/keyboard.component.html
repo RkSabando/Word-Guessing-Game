@@ -1,0 +1,17 @@
+<div *ngIf="(letters | json) !== '{}'" class="flex justify-center gap-4 flex-wrap">
+    <div [ngClass]="{'shadow-none opacity-75 pointer-events-none': letterIncluded(item.key)}" (click)="selectLetter(item.key)" *ngFor="let item of letters | keyvalue" class="{{ letterIncluded(item.key) ? (checkWrongLetter(item.key) ? 'bg-gray-300' : 'bg-green-300') : 'bg-white'  }} rounded-lg  border cursor-pointer border-gray-100 text-gray-700 shadow p-2 w-16 h-16 flex items-center justify-center relative">
+        <h2 class="text-4xl font-bold">{{ item.key | titlecase }}</h2>
+
+        <div *ngIf="checkWrongLetter(item.key)" class="absolute w-full h-full rounded-lg bg-red-700 z-10 wrong opacity-30"></div>
+    </div>
+</div>
+
+<div class="mt-10 flex justify-center gap-8">
+    <ng-container *ngIf="wrongLetters?.length; else noWrong">
+        <div *ngFor="let item of wrongLetters" class="w-16 h-16 rounded-lg border-8 bg-red-200 border-red-600 flex items-center justify-center relative text-red-600"><mat-icon style="font-size: 50px;height: 50px;width:50px">close</mat-icon></div>
+    </ng-container>
+    <ng-template #noWrong>
+        <div class="w-16 h-16 rounded-lg">&nbsp;</div>
+    </ng-template>
+    
+</div>

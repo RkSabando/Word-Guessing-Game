@@ -1,7 +1,11 @@
 
-<div class="flex justify-between items-center mb-16">
-    <h2>Word List</h2>
-    <button (click)="clickAdd()" mat-mini-fab color="primary" aria-label="Example icon button with a home icon">
+<div class="flex justify-between items-center mb-16 gap-4">
+    <h2 class="text-gray-700 text-2xl mr-auto">Manage {{ tabIndex == 1 ? 'Letters' : 'Words'}}</h2>
+    <button (click)="editLetters()" mat-mini-fab [color]="tabIndex ? 'primary' : 'accent'" aria-label="Example icon button with a home icon">
+        <mat-icon *ngIf="!tabIndex">sort_by_alpha</mat-icon>
+        <mat-icon *ngIf="tabIndex">arrow_back</mat-icon>
+    </button>
+    <button *ngIf="!tabIndex" (click)="clickAdd()" mat-mini-fab color="primary" aria-label="Example icon button with a home icon">
         <mat-icon>add</mat-icon>
     </button>
 </div>
@@ -11,7 +15,18 @@
         <mat-tab label="First">
             <ng-container *ngIf="(words$ | async)?.length; else noWords">
                 <mat-card >
-                    <div class="text-center text-gray-500 p-10 shadow-sm bg-gray-100 rounded-sm">word list</div>
+                    <div *ngFor="let item of words$ | async; let last=last; let index=index" [ngClass]="{'border-b-2 border-gray-200': !last }" class="py-2 px-4 flex justify-between gap-4 group cursor-pointer hover:bg-gray-200 rounded-sm">
+                        <h2 class="text-gray-700 text-lg pt-3">{{ item.word }}</h2>
+
+                        <div class="flex invisible gap-4 items-center group-hover:visible text-sm">
+                            <button (click)="deleteWord(index)" mat-icon-button color="warn" aria-label="Example icon button with a home icon">
+                                <mat-icon style="font-size:24px">delete</mat-icon>
+                            </button>
+                            <button (click)="clickAdd(item)" mat-icon-button color="primary" aria-label="Example icon button with a home icon">
+                                <mat-icon style="font-size:24px">edit</mat-icon>
+                            </button>
+                        </div>
+                    </div>
                 </mat-card>
             </ng-container>
             <ng-template #noWords>
@@ -19,9 +34,26 @@
             </ng-template>
         </mat-tab>
         <mat-tab label="Second">
-            <div class="text-center text-gray-500 p-10 shadow-sm bg-gray-100 rounded-sm">
-                
-            </div>
+            <mat-card>
+                <div class="flex gap-4 flex-wrap text-gray-700 p-10 rounded-sm">
+                    <div *ngIf="letters$ | async as letters" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div *ngFor="let item of letters | keyvalue" class="col-span-1 grid grid-cols-8">
+                            <div class="cols-span-4 sm:col-span-3 lg:col-span-2 text-center flex justify-center items-center">
+                                <h2 class="font-bold text-4xl">{{  item.key | titlecase }}: </h2>
+                            </div>
+                            <div class="cols-span-4 sm:col-span-5 lg:col-span-6 flex items-center justify-end group relative">
+                                <input (blur)="onBlur(item, element)" #element [ngClass]="{'cursor-default': currentLetter !== item.key}" [readonly]="currentLetter !== item.key" [value]="item.value" class="{{ currentLetter === item.key ? 'outline-none bg-white border-blue-500' : 'bg-gray-200 border-gray-200 '}} appearance-none inline-block w-full  text-gray-700 border rounded py-3 px-4 leading-tight" type="number" placeholder="1">
+                                <span *ngIf="currentLetter !== item.key" (click)="editLetter(item, element)" class="absolute cursor-pointer invisible group-hover:visible right-2 flex items-center justify-center">
+                                    <mat-icon style="font-size:18px;height:18px;width: 18px;">edit</mat-icon>
+                                </span>
+                                <span *ngIf="currentLetter === item.key" (click)="changeLetterValue(item, element)" class="absolute cursor-pointer right-2 flex items-center justify-center">
+                                    <mat-icon color="accent" style="font-size:18px;height:18px;width: 18px;">done</mat-icon>
+                                </span>
+                            </div>
+                        </div>   
+                    </div>
+                </div>
+            </mat-card>
         </mat-tab>
     </mat-tab-group>
 </div>

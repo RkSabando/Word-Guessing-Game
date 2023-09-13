@@ -1,21 +1,40 @@
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, ElementRef, Inject, QueryList, ViewChildren } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { NgClass, NgFor, NgIf, SlicePipe } from '@angular/common';
+import { CUSTOM_ELEMENTS_SCHEMA, Component, ElementRef, Inject, QueryList, ViewChildren } from '@angular/core';
+import { AbstractControl, FormArray, FormBuilder,  FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { Word } from 'src/app/services/state/state.service';
 
 @Component({
   selector: 'app-word-form',
   templateUrl: './word-form.component.html',
-  styleUrls: ['./word-form.component.scss']
+  styleUrls: ['./word-form.component.scss'],
+  standalone: true,
+  imports:[
+    NgIf,
+    NgClass,
+    NgFor,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatDialogModule,
+    DragDropModule,
+    MatIconModule,
+    SlicePipe
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class WordFormComponent {
   wordForm: FormGroup = new FormGroup([]);
   currentIndex: number = 0;
-  @ViewChildren("element") contenEditables!: QueryList<ElementRef>;
+  textAreaDefaultHeight:number = 42;
+  isEditing: boolean = false;
   
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: null | Object,
-    private fb: FormBuilder
+    @Inject(MAT_DIALOG_DATA) public data: null | Word,
+    private fb: FormBuilder,
+    private matDialog: MatDialogRef<WordFormComponent>
   ) {
     this.initializeForm();
   }
@@ -28,7 +47,20 @@ export class WordFormComponent {
       clues: this.fb.array([])
     });
 
-    if(!this.data) this.addClue(null);
+    if(this.data) {
+      this.wordForm.patchValue({word: this.data.word});
+      this.data.clues.forEach(clue => {
+        this.clues.push(this.fb.group({
+          clue: [clue.clue, Validators.required]
+        }));
+      });
+  
+      this.wordForm.updateValueAndValidity();
+      
+    }
+
+    this.addClue(null);
+    this.currentIndex = this.clues.length - 1;
   }
 
   get clues() {
@@ -40,7 +72,6 @@ export class WordFormComponent {
   }
 
   addClue(control?: AbstractControl | null, edit?: boolean) {
-    console.log('edit: ', edit);
     const cluesForm = this.fb.group({
         clue: ['', Validators.required]
     });
@@ -50,47 +81,59 @@ export class WordFormComponent {
       this.currentIndex = this.clues.length - 1;
     } else if(edit && control?.valid) {
       this.currentIndex = this.clues.length - 1;
-      console.log('length', this.clues.length);
-      console.log('this.currentIndex', this.currentIndex);
+      this.isEditing = false;
     }
   }
 
   deleteClue(clueIndex: number) {
     this.clues.removeAt(clueIndex);
+    this.clues.updateValueAndValidity();
     this.currentIndex = this.clues.length - 1;
+    this.isEditing = false;
+
   }
 
-  logss(any: any) {
-    console.log('any', any);
-  }
-
-  editClue(index: number) {
-    console.log('ca')
+  editClue(index: number, element: HTMLTextAreaElement) {
     if(!this.clues.controls.some((formGroup, index) => index != this.clues.length - 1 && formGroup.invalid)) {
       this.currentIndex = index;
       setTimeout(() => {
-        // .nativeElement.focus();
-        this.placeCaretAtEnd(this.contenEditables.toArray()[index])
+        this.placeCaretAtEnd(element);
       });
+      this.isEditing = true;
     }
 
   }
 
   drop(event: any) {
     if(event?.container?.data)
-      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+      moveItemInArray(this.clues.controls, event.previousIndex, event.currentIndex);
   }
 
-  placeCaretAtEnd(el: ElementRef) {
-    el.nativeElement.focus();
-    if (typeof window.getSelection != "undefined"
-            && typeof document.createRange != "undefined") {
-        var range = document.createRange();
-        range.selectNodeContents(el.nativeElement);
-        range.collapse(false);
-        var sel = window.getSelection();
-        sel?.removeAllRanges();
-        sel?.addRange(range);
-    } 
-}
+  placeCaretAtEnd(el: HTMLTextAreaElement) {
+    el.focus();
+    el.setSelectionRange(el.value.length,el.value.length);
+  }
+  
+  autoResize(element: HTMLTextAreaElement) {
+      element.style.height = '0px';
+      element.style.height = `${Math.max(this.textAreaDefaultHeight, element.scrollHeight)}px`;
+  }
+
+  get cluesValidity(): boolean {
+    let length = this.clues.controls.length;
+    return length < 2 ?? this.clues.controls.some((formControl, index) => index != length -1 ? formControl.invalid : false );
+  }
+
+  saveAction() {
+    let clues = this.clues.controls.map(clue => clue.value);
+    let formValues = {
+      word: this.wordForm.get('word')?.value,
+      clues
+    };
+    this.matDialog.close(formValues);
+  }
+
+  cancelAction() {
+    this.matDialog.close(false);
+  }
 }
