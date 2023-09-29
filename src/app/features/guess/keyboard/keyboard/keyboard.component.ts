@@ -54,16 +54,22 @@ export class KeyboardComponent {
   allowInput: boolean = true;
 
   selectLetter(letter: string) {
-    if(!this.letterIncluded(letter) && this.allowInput) {
-      this.showLetter(letter);
-    }
+    if(this.currentWord.split('').every(letter => this.letterIncluded(letter.toUpperCase()))) {
+      return;
+    } else {
+      if(!this.letterIncluded(letter.toUpperCase()) && this.allowInput) {
+        this.showLetter(letter.toUpperCase());
+      }
+    };
+
   }
 
   letterIncluded(letter: string) {
-    return this.selectedLetters.includes(letter);
+    return this.selectedLetters.includes(letter.toUpperCase());
   }
 
   showLetter(letter: string) {
+    letter = letter.toUpperCase();
     if(this.allowInput) {
       this.allowInput = false;
       let dialogRef = this.dialog.open(LetterModalComponent, {
@@ -77,7 +83,10 @@ export class KeyboardComponent {
         this.selectedLetters.push(letter);
         this.selectionChange.next(letter);
         if(!this.currentWord.includes(letter)) {
-          this.wrongLetters.push(letter)
+          this.wrongLetters.push(letter);
+          this.playAudio();
+        } else if(this.currentWord.includes(letter)) {
+          this.playAudio(true);
         }
         this.allowInput = true;
       },1000)
@@ -85,7 +94,7 @@ export class KeyboardComponent {
   }
 
   checkWrongLetter(letter: string): boolean {
-    return this.wrongLetters.includes(letter);
+    return this.wrongLetters.includes(letter.toUpperCase());
   }
 
   showAllLetters() {
@@ -104,6 +113,13 @@ export class KeyboardComponent {
     this.selectedLetters= [];
     this.wrongLetters = [];
     this.actionChange.next(next ? 'next' : 'reset');
+  }
+
+  async playAudio(correct = false){
+    let audio = new Audio();
+    audio.src = `../../../../assets/sounds/${correct ? 'correct' : 'wrong'}.mp3`;
+    await audio.load();
+    await audio.play();
   }
 }
 

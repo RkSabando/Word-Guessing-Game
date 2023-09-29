@@ -31,9 +31,9 @@ export class ManageComponent implements OnInit, OnDestroy {
     this.vm = this.storage.get('state');
   }
 
-  ngOnInit(): void {
-    this.initializeWords();
-    this.initializeLetters();
+  async ngOnInit() {
+    await this.initializeWords();
+    await this.initializeLetters();
   }
 
   async initializeWords() {
@@ -41,10 +41,12 @@ export class ManageComponent implements OnInit, OnDestroy {
       this.state.wordsSubject.next(this.vm.words);
     } else {
       let obj = {
-          words: []
+          words: [],
+          ...this.vm
       };
-
-      this.storage.set('state', obj);
+      this.state.wordsSubject.next([]);
+      this.vm = obj;
+      this.updateWords();
     }
   }
 
@@ -56,7 +58,7 @@ export class ManageComponent implements OnInit, OnDestroy {
           ...this.vm,
           letters: this.state.lettersSubject.getValue()
       };
-
+      this.vm = obj;
       this.storage.set('state', obj);
     }
   }

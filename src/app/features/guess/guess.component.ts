@@ -92,7 +92,7 @@ export class GuessComponent implements OnInit {
     let pattern = new RegExp(event, 'ig');
     let occurences = (this.currentWord?.word?.match(pattern) || []).length;
     
-    this.score += Number.isNaN(occurences * parseInt(this.vm?.letters[event])) ? 0 : occurences * parseInt(this.vm?.letters[event]);
+    this.score += Number.isNaN(occurences * parseInt(this.vm?.letters[event.toLowerCase()])) ? 0 : occurences * parseInt(this.vm?.letters[event.toLowerCase()]);
   }
 
   nextClue() {

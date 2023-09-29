@@ -127,7 +127,7 @@ export class WordFormComponent {
   saveAction() {
     let clues = this.clues.controls.map(clue => clue.value);
     let formValues = {
-      word: this.wordForm.get('word')?.value,
+      word: this.wordForm.get('word')?.value.toUpperCase(),
       clues
     };
     this.matDialog.close(formValues);

@@ -8,7 +8,7 @@
             <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
               Word/Phrase
             </label>
-            <input [ngClass]="{'border-red-300': wordForm.get('word')?.dirty &&  wordForm.get('word')?.hasError('required') }" formControlName="word" class="appearance-none block w-full bg-white text-gray-700 border text-sm rounded-lg p-2.5 mb-1 leading-tight focus:outline-none focus:bg-white focus:ring-blue-500 focus:border-blue-500" type="text" placeholder="Word/Phrase to guess">
+            <input [ngClass]="{'border-red-300': wordForm.get('word')?.dirty &&  wordForm.get('word')?.hasError('required') }" formControlName="word" class="appearance-none block w-full bg-white uppercase text-gray-700 border text-sm rounded-lg p-2.5 mb-1 leading-tight focus:outline-none focus:bg-white focus:ring-blue-500 focus:border-blue-500" type="text" placeholder="Word/Phrase to guess">
             <p class="{{wordForm.get('word')?.dirty &&  wordForm.get('word')?.hasError('required') ? 'visible' : 'invisible' }} text-red-300 text-xs italic mb-2">Please fill out this field.</p>
           </div>
           <div class="w-full px-3">
